@@ -14,13 +14,21 @@ app.secret_key = "loke2005@."
 bcrypt = Bcrypt(app)
 
 # --- MYSQL CONNECTION ---
-def get_db_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="loke2005@.",
-        database="myappdb"
+import os
+from urllib.parse import urlparse
+
+db_url = os.getenv("DATABASE_URL")  # set this in Render
+
+if db_url:
+    url = urlparse(db_url)
+    conn = mysql.connector.connect(
+        host=url.hostname,
+        user=url.username,
+        password=url.password,
+        database=url.path[1:],  # strip leading '/'
+        port=url.port
     )
+
 
 # --- LOAD TRAINED MODEL + METADATA ---
 MODEL_PATH = "model.pkl"
